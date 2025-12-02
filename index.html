@@ -46,7 +46,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebase/9/firebase-app.js";
-        // تم إضافة signInWithEmailAndPassword و signOut هنا
+        // تم استيراد جميع الدوال اللازمة
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebase/9/firebase-auth.js"; 
 
         // 1. بيانات إعداد مشروعك
@@ -64,8 +64,8 @@
         const app = initializeApp(firebaseConfig);
         window.auth = getAuth(app);
         window.onAuthStateChanged = onAuthStateChanged;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword; // مُخزنة عالمياً
-        window.signOut = signOut; // مُخزنة عالمياً
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword; 
+        window.signOut = signOut; 
     </script>
 
     <script>
@@ -75,9 +75,9 @@
 
         // دالة التعامل مع تسجيل الدخول
         async function handleLogin(email, password) {
-            // التصحيح: نستخدم الدوال المخزنة مباشرة في window
+            // التصحيح: استخدام أسماء جديدة للمتغيرات لضمان عدم التعارض
             const authService = window.auth; 
-            const signInWithEmailAndPasswordService = window.signInWithEmailAndPassword; // تم التصحيح لاستخدام المتغير العالمي
+            const signInService = window.signInWithEmailAndPassword; // استخدام اسم متغير جديد: signInService
 
             const errorMessageElement = document.getElementById('error-message');
             if (errorMessageElement) {
@@ -86,12 +86,13 @@
             }
 
             try {
-                // محاولة تسجيل الدخول
-                await signInWithEmailAndPasswordService(authService, email, password); // تم التصحيح
+                // محاولة تسجيل الدخول باستخدام المتغير الجديد
+                await signInService(authService, email, password); 
 
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.message);
 
+                // الآن يجب أن يعمل هذا الجزء بشكل صحيح ويعرض رسائل الأخطاء المحددة
                 let message = "حدث خطأ غير معروف في تسجيل الدخول.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
@@ -111,10 +112,10 @@
         // دالة تسجيل الخروج
         async function logoutUser() {
             const authService = window.auth;
-            const signOutService = window.signOut; // تم التصحيح لاستخدام المتغير العالمي
+            const signOutService = window.signOut; // استخدام اسم متغير جديد: signOutService
             
             try {
-                await signOutService(authService); // تم التصحيح
+                await signOutService(authService); // استخدام المتغير الجديد
             } catch (error) {
                 console.error("خطأ في تسجيل الخروج:", error.message);
                 alert("فشل تسجيل الخروج.");
@@ -122,7 +123,7 @@
         }
 
         // ----------------------------------------------------------------------
-        // الدوال المدمجة من js/app.js (لا تتطلب تعديلات إضافية)
+        // الدوال المدمجة من js/app.js 
         // ----------------------------------------------------------------------
         
         // دالة التنقل بين الواجهات
@@ -156,11 +157,10 @@
 
             if (loginButton) {
                 loginButton.addEventListener('click', () => {
-                    // رسالة الالتقاط ظهرت سابقاً، يمكن إزالتها لتجنب الإزعاج
-                    // alert("✅ تم التقاط ضغطة زر الدخول... جاري المحاولة."); 
                     const email = document.getElementById('email').value;
                     const password = document.getElementById('password').value;
-                    handleLogin(email, password);
+                    // يتم استدعاء الدالة المدمجة
+                    handleLogin(email, password); 
                 });
             }
 
