@@ -45,157 +45,157 @@
     </div>
 
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebase/9/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebase/9/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebase/9/firebase-app.js";
+        // تم إضافة signInWithEmailAndPassword و signOut هنا
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebase/9/firebase-auth.js"; 
 
-    // 1. بيانات إعداد مشروعك (قم بتضمينها هنا مباشرة)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCIjIjs-2nhLrtssISWc0pNuX2UzxhQ3ZE",
-      authDomain: "shipping-tracker-pro.firebaseapp.com",
-      projectId: "shipping-tracker-pro",
-      storageBucket: "shipping-tracker-pro.firebasestorage.app",
-      messagingSenderId: "188119609466",
-      appId: "1:188119609466:web:2f2498def75deb9905cbc3",
-      measurementId: "G-6V51EXWFMJ"
-    };
+        // 1. بيانات إعداد مشروعك
+        const firebaseConfig = {
+          apiKey: "AIzaSyCIjIjs-2nhLrtssISWc0pNuX2UzxhQ3ZE",
+          authDomain: "shipping-tracker-pro.firebaseapp.com",
+          projectId: "shipping-tracker-pro",
+          storageBucket: "shipping-tracker-pro.firebasestorage.app",
+          messagingSenderId: "188119609466",
+          appId: "1:188119609466:web:2f2498def75deb9905cbc3",
+          measurementId: "G-6V51EXWFMJ"
+        };
 
-    // 2. تهيئة التطبيق وتصدير الخدمات عالمياً (للوصول إليها من app.js)
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    window.onAuthStateChanged = onAuthStateChanged;
+        // 2. تهيئة التطبيق وتخزين الخدمات والدوال عالمياً (Global)
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword; // مُخزنة عالمياً
+        window.signOut = signOut; // مُخزنة عالمياً
+    </script>
 
-    // Note: تم وضع الخدمات على "window" لجعلها متاحة لملفات JS الأخرى
-</script>
+    <script>
+        // ----------------------------------------------------------------------
+        // الدوال المدمجة من js/auth.js (مُصححة)
+        // ----------------------------------------------------------------------
 
-<script>
-    // ----------------------------------------------------------------------
-    // محتويات ملف js/auth.js الآن في HTML
-    // ----------------------------------------------------------------------
+        // دالة التعامل مع تسجيل الدخول
+        async function handleLogin(email, password) {
+            // التصحيح: نستخدم الدوال المخزنة مباشرة في window
+            const authService = window.auth; 
+            const signInWithEmailAndPasswordService = window.signInWithEmailAndPassword; // تم التصحيح لاستخدام المتغير العالمي
 
-    // دالة التعامل مع تسجيل الدخول
-    async function handleLogin(email, password) {
-        // نستخدم window.auth و window.firebase الدوال التي سيتم تحميلها عالمياً
-        const authService = window.auth; 
-        const signInWithEmailAndPassword = window.firebase.signInWithEmailAndPassword;
-
-        const errorMessageElement = document.getElementById('error-message');
-        if (errorMessageElement) {
-            errorMessageElement.textContent = ''; 
-            errorMessageElement.style.display = 'none';
-        }
-
-        try {
-            await signInWithEmailAndPassword(authService, email, password);
-
-        } catch (error) {
-            console.error("خطأ في تسجيل الدخول:", error.message);
-
-            let message = "حدث خطأ غير معروف.";
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-            } else if (error.code === 'auth/invalid-email') {
-                message = "صيغة البريد الإلكتروني غير صحيحة.";
-            } else if (error.code === 'auth/too-many-requests') {
-                 message = "تم حظر هذا الحساب مؤقتاً. الرجاء المحاولة لاحقاً.";
-            }
-
+            const errorMessageElement = document.getElementById('error-message');
             if (errorMessageElement) {
-                errorMessageElement.textContent = `فشل الدخول: ${message}`;
-                errorMessageElement.style.display = 'block';
+                errorMessageElement.textContent = ''; 
+                errorMessageElement.style.display = 'none';
+            }
+
+            try {
+                // محاولة تسجيل الدخول
+                await signInWithEmailAndPasswordService(authService, email, password); // تم التصحيح
+
+            } catch (error) {
+                console.error("خطأ في تسجيل الدخول:", error.message);
+
+                let message = "حدث خطأ غير معروف في تسجيل الدخول.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+                } else if (error.code === 'auth/invalid-email') {
+                    message = "صيغة البريد الإلكتروني غير صحيحة.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    message = "تم حظر هذا الحساب مؤقتاً. الرجاء المحاولة لاحقاً.";
+                }
+
+                if (errorMessageElement) {
+                    errorMessageElement.textContent = `فشل الدخول: ${message}`;
+                    errorMessageElement.style.display = 'block';
+                }
             }
         }
-    }
 
-    // دالة تسجيل الخروج
-    async function logoutUser() {
-        const authService = window.auth;
-        const signOut = window.firebase.signOut;
-        
-        try {
-            await signOut(authService);
-        } catch (error) {
-            console.error("خطأ في تسجيل الخروج:", error.message);
-            alert("فشل تسجيل الخروج.");
+        // دالة تسجيل الخروج
+        async function logoutUser() {
+            const authService = window.auth;
+            const signOutService = window.signOut; // تم التصحيح لاستخدام المتغير العالمي
+            
+            try {
+                await signOutService(authService); // تم التصحيح
+            } catch (error) {
+                console.error("خطأ في تسجيل الخروج:", error.message);
+                alert("فشل تسجيل الخروج.");
+            }
         }
-    }
 
-    // ----------------------------------------------------------------------
-    // محتويات ملف js/app.js الآن في HTML
-    // ----------------------------------------------------------------------
-    
-    // دالة التنقل بين الواجهات
-    function navigateTo(pageId) {
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.remove('active');
-            page.classList.add('hidden');
-        });
-
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) {
-            targetPage.classList.remove('hidden');
-            targetPage.classList.add('active');
-        }
-    }
-
-    // وظيفة تحديث واجهة المستخدم
-    function updateDashboardUI(user) {
-        const welcomeText = document.getElementById('welcome-user-text');
-        if (welcomeText && user) {
-            const email = user.email || "مستخدم";
-            welcomeText.textContent = `مرحباً بك، ${email}`;
-        }
-    }
-
-    // وظيفة التهيئة الرئيسية
-    document.addEventListener('DOMContentLoaded', () => {
+        // ----------------------------------------------------------------------
+        // الدوال المدمجة من js/app.js (لا تتطلب تعديلات إضافية)
+        // ----------------------------------------------------------------------
         
-        // **فحص التحميل:** هذا التنبيه يجب أن يظهر فوراً!
-        alert("🟢 يجب أن يعمل الآن! تم تحميل الكود مباشرة.");
-        
-        // ربط زر تسجيل الدخول
-        const loginButton = document.getElementById('login-button');
-
-        if (loginButton) {
-            loginButton.addEventListener('click', () => {
-                alert("✅ تم التقاط ضغطة زر الدخول... جاري المحاولة."); 
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                handleLogin(email, password);
+        // دالة التنقل بين الواجهات
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+                page.classList.add('hidden');
             });
-        }
 
-        // ربط زر تسجيل الخروج
-        const logoutButton = document.getElementById('logout-button');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', logoutUser);
-        }
-
-        // ربط أزرار التنقل
-        const createShipmentBtn = document.getElementById('go-to-create-shipment');
-        if (createShipmentBtn) createShipmentBtn.addEventListener('click', () => navigateTo('create-shipment-page'));
-
-        const invoicesBtn = document.getElementById('go-to-invoices');
-        if (invoicesBtn) invoicesBtn.addEventListener('click', () => navigateTo('invoices-page'));
-
-        const dashboardBtn = document.getElementById('go-to-dashboard');
-        if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
-
-        // مراقبة حالة المستخدم
-        const authService = window.auth;
-        const authStateChanged = window.onAuthStateChanged;
-
-        authStateChanged(authService, (user) => {
-            if (user) {
-                console.log("المستخدم مسجل الدخول:", user.uid);
-                updateDashboardUI(user);
-                navigateTo('dashboard-page');
-            } else {
-                console.log("المستخدم غير مسجل.");
-                navigateTo('login-page');
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('active');
             }
-        });
-    });
-</script>
+        }
 
+        // وظيفة تحديث واجهة المستخدم
+        function updateDashboardUI(user) {
+            const welcomeText = document.getElementById('welcome-user-text');
+            if (welcomeText && user) {
+                const email = user.email || "مستخدم";
+                welcomeText.textContent = `مرحباً بك، ${email}`;
+            }
+        }
+
+        // وظيفة التهيئة الرئيسية
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // ربط زر تسجيل الدخول
+            const loginButton = document.getElementById('login-button');
+
+            if (loginButton) {
+                loginButton.addEventListener('click', () => {
+                    // رسالة الالتقاط ظهرت سابقاً، يمكن إزالتها لتجنب الإزعاج
+                    // alert("✅ تم التقاط ضغطة زر الدخول... جاري المحاولة."); 
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    handleLogin(email, password);
+                });
+            }
+
+            // ربط زر تسجيل الخروج
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', logoutUser);
+            }
+
+            // ربط أزرار التنقل
+            const createShipmentBtn = document.getElementById('go-to-create-shipment');
+            if (createShipmentBtn) createShipmentBtn.addEventListener('click', () => navigateTo('create-shipment-page'));
+
+            const invoicesBtn = document.getElementById('go-to-invoices');
+            if (invoicesBtn) invoicesBtn.addEventListener('click', () => navigateTo('invoices-page'));
+
+            const dashboardBtn = document.getElementById('go-to-dashboard');
+            if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
+
+            // مراقبة حالة المستخدم
+            const authService = window.auth;
+            const authStateChanged = window.onAuthStateChanged;
+
+            authStateChanged(authService, (user) => {
+                if (user) {
+                    console.log("المستخدم مسجل الدخول:", user.uid);
+                    updateDashboardUI(user);
+                    navigateTo('dashboard-page');
+                } else {
+                    console.log("المستخدم غير مسجل.");
+                    navigateTo('login-page');
+                }
+            });
+        });
+    </script>
+    
 </body>
 </html>
