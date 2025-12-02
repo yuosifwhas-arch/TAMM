@@ -1,12 +1,13 @@
-// js/auth.js
+// js/auth.js (التحويل لاستخدام المتغيرات العالمية)
 
-import { auth } from "./firebaseConfig.js";
-import { signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebase/9/firebase-auth.js";
-
-// تم حذف import { navigateTo } من هنا لحل مشكلة التعارض
+// تم حذف عبارات import لأن الخدمات أصبحت متاحة عالمياً عبر وسم <script> في index.html
 
 // دالة التعامل مع تسجيل الدخول
 export async function handleLogin(email, password) {
+    // نستخدم window.auth و window.firebase الدوال التي سيتم تحميلها عالمياً
+    const authService = window.auth; 
+    const signInWithEmailAndPassword = window.firebase.signInWithEmailAndPassword;
+
     const errorMessageElement = document.getElementById('error-message');
     // التأكد من وجود العنصر لتجنب الأخطاء
     if (errorMessageElement) {
@@ -16,8 +17,7 @@ export async function handleLogin(email, password) {
 
     try {
         // محاولة تسجيل الدخول
-        await signInWithEmailAndPassword(auth, email, password);
-        // لا نحتاج لاستدعاء navigateTo هنا، لأن onAuthStateChanged في app.js ستقوم بذلك تلقائياً
+        await signInWithEmailAndPassword(authService, email, password);
 
     } catch (error) {
         console.error("خطأ في تسجيل الدخول:", error.message);
@@ -40,8 +40,11 @@ export async function handleLogin(email, password) {
 
 // دالة تسجيل الخروج
 export async function logoutUser() {
+    const authService = window.auth;
+    const signOut = window.firebase.signOut;
+    
     try {
-        await signOut(auth);
+        await signOut(authService);
         // التنقل سيحدث تلقائياً عبر app.js
     } catch (error) {
         console.error("خطأ في تسجيل الخروج:", error.message);
