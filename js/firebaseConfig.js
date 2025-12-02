@@ -8,12 +8,13 @@ import { getFirestore } from "https://www.gstatic.com/firebase/9/firebase-firest
 
 // 2. **بيانات إعداد مشروعك - قم بتغيير هذه القيم!**
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", 
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCIjIjs-2nhLrtssISWc0pNuX2UzxhQ3ZE",
+  authDomain: "shipping-tracker-pro.firebaseapp.com",
+  projectId: "shipping-tracker-pro",
+  storageBucket: "shipping-tracker-pro.firebasestorage.app",
+  messagingSenderId: "188119609466",
+  appId: "1:188119609466:web:2f2498def75deb9905cbc3",
+  measurementId: "G-6V51EXWFMJ"
 };
 
 // 3. تهيئة التطبيق
