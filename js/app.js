@@ -1,9 +1,10 @@
 // js/app.js
 
+// 1. استيراد الخدمات والدوال الضرورية
 import { auth, onAuthStateChanged } from "./firebaseConfig.js";
 import { handleLogin, logoutUser } from "./auth.js"; 
 
-// 1. دالة التنقل بين الواجهات
+// 2. دالة التنقل بين الواجهات
 export function navigateTo(pageId) {
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -17,26 +18,35 @@ export function navigateTo(pageId) {
     }
 }
 
-// 2. وظيفة تحديث واجهة المستخدم
+// 3. وظيفة تحديث واجهة المستخدم (عرض البريد الإلكتروني)
 function updateDashboardUI(user) {
     const welcomeText = document.getElementById('welcome-user-text');
     if (welcomeText && user) {
-        // التحقق من وجود user.email قبل عرضه
         const email = user.email || "مستخدم";
         welcomeText.textContent = `مرحباً بك، ${email}`;
     }
 }
 
-// 3. وظيفة التهيئة الرئيسية
+// 4. وظيفة التهيئة الرئيسية
 document.addEventListener('DOMContentLoaded', () => {
-
-    // أ. ربط نموذج تسجيل الدخول
+    
+    // **فحص التحميل:** هذا التنبيه يجب أن يظهر فوراً عند تحميل الصفحة.
+    alert("🟢 تم تحميل ملف app.js بنجاح!");
+    
+    // أ. ربط زر تسجيل الدخول (نستخدم حدث النقر `click` بعد تعديل الزر في HTML)
+    const loginButton = document.getElementById('login-button');
     const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+
+    if (loginButton && loginForm) {
+        loginButton.addEventListener('click', () => {
+            
+            // تنبيه ثانٍ للتأكد من وصول الكود إلى هنا
+            alert("✅ تم التقاط ضغطة زر الدخول... جاري المحاولة."); 
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            
+            // استدعاء دالة المصادقة
             handleLogin(email, password);
         });
     }
@@ -47,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutButton.addEventListener('click', logoutUser);
     }
 
-    // ج. ربط أزرار التنقل (احتياطي للمستقبل)
+    // ج. ربط أزرار التنقل (لواجهات مستقبلية)
     const createShipmentBtn = document.getElementById('go-to-create-shipment');
     if (createShipmentBtn) createShipmentBtn.addEventListener('click', () => navigateTo('create-shipment-page'));
 
@@ -57,9 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardBtn = document.getElementById('go-to-dashboard');
     if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
 
-    // د. مراقبة حالة المستخدم (المحرك الرئيسي للتطبيق)
+    // د. مراقبة حالة المستخدم (المحرك الرئيسي)
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // alert("تم تسجيل الدخول بنجاح! الانتقال للوحة التحكم"); // يمكن تفعيل هذا التنبيه إذا أردت
             console.log("المستخدم مسجل الدخول:", user.uid);
             updateDashboardUI(user);
             navigateTo('dashboard-page');
