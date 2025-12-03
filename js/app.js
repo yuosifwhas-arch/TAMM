@@ -40,17 +40,19 @@ function renderShipments(shipments) {
     shipments.forEach(shipment => {
         const row = tableBody.insertRow(-1); // إضافة صف جديد
         
-        // ** [تعديل هنا] التعامل مع حقل Timestamp من Firestore **
+        // ** [تم التعديل لمعالجة Timestamp] **
         let formattedDate = 'غير متوفر';
         if (shipment.createdAt) {
+             // التحقق مما إذا كان الكائن يحتوي على دالة toDate()، وهو سمة كائنات Timestamp في Firebase
              if (typeof shipment.createdAt.toDate === 'function') {
-                 // الخيار الأفضل: إذا كان كائن Timestamp من Firebase V8
+                 // إذا كان كائن Timestamp: قم بتحويله إلى Date، ثم قم بتنسيقه
                  formattedDate = shipment.createdAt.toDate().toLocaleDateString('ar-EG');
              } else {
-                 // الخيار الاحتياطي: إذا تم تحويله إلى كائن تاريخ عادي أو نص
+                 // كود احتياطي (في حال تم إرساله كنص أو كائن Date عادي)
                  formattedDate = new Date(shipment.createdAt).toLocaleDateString('ar-EG');
              }
         }
+        // ** [نهاية التعديل] **
 
         row.innerHTML = `
             <td>${shipment.id}</td>
@@ -67,7 +69,6 @@ async function loadShipments(userId) {
 
     try {
         // الاستعلام عن الشحنات التي تعود للمستخدم الحالي
-        // (يجب أن يكون لديك مجموعة 'shipments' وحقل 'customerUid' مطابق لـ userId)
         const snapshot = await db.collection('shipments')
             .where('customerUid', '==', userId)
             .get();
