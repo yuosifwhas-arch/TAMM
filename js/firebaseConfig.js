@@ -12,9 +12,11 @@ const firebaseConfig = {
 // تهيئة التطبيق
 const app = firebase.initializeApp(firebaseConfig);
 
-// تعريف المتغيرات العالمية (لتسهيل الوصول إليها من الملفات الأخرى)
+// تعريف المتغيرات العالمية (V8)
 window.auth = firebase.auth();
 window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(firebase.auth());
 window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(firebase.auth());
 window.signOut = firebase.auth().signOut.bind(firebase.auth());
-// يمكننا هنا مستقبلاً إضافة window.db = firebase.firestore();
+
+// ** [جديد] إضافة تهيئة Firestore **
+window.db = firebase.firestore();
