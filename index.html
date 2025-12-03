@@ -71,7 +71,6 @@
         // دالة التعامل مع تسجيل الدخول
         async function handleLogin(email, password) {
             // نستخدم المتغيرات العالمية
-            const authService = window.auth; 
             const signInService = window.signInWithEmailAndPassword;
 
             const errorMessageElement = document.getElementById('error-message');
@@ -91,9 +90,8 @@
             }
 
             try {
-                // محاولة تسجيل الدخول
-                // استخدام (authService) كأول معامِل هو الحل الوسط الذي يعمل مع V8 و V9 Compat
-                await signInService(authService, email, password); 
+                // محاولة تسجيل الدخول - تم إزالة authService
+                await signInService(email, password); 
 
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.message);
@@ -115,11 +113,11 @@
 
         // دالة تسجيل الخروج
         async function logoutUser() {
-            const authService = window.auth;
             const signOutService = window.signOut;
             
             try {
-                await signOutService(authService);
+                // تم إزالة authService
+                await signOutService();
             } catch (error) {
                 console.error("خطأ في تسجيل الخروج:", error.message);
                 alert("فشل تسجيل الخروج.");
@@ -164,7 +162,6 @@
                 logoutButton.addEventListener('click', logoutUser);
             }
 
-            // ربط أزرار التنقل (للتأكد من عدم وجود أخطاء)
             const createShipmentBtn = document.getElementById('go-to-create-shipment');
             if (createShipmentBtn) createShipmentBtn.addEventListener('click', () => navigateTo('create-shipment-page'));
 
@@ -172,10 +169,10 @@
             if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
 
             // مراقبة حالة المستخدم
-            const authService = window.auth;
             const authStateChanged = window.onAuthStateChanged;
 
-            authStateChanged(authService, (user) => {
+            // تم إزالة authService كمعامل
+            authStateChanged((user) => {
                 if (user) {
                     console.log("المستخدم مسجل الدخول:", user.uid);
                     updateDashboardUI(user);
