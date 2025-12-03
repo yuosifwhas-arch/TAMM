@@ -23,6 +23,64 @@ function updateDashboardUI(user) {
     }
 }
 
+// ==========================================
+// الدوال الجديدة: جلب وعرض الشحنات
+// ==========================================
+
+function renderShipments(shipments) {
+    const tableBody = document.getElementById('shipments-table');
+    // مسح المحتوى الحالي
+    tableBody.innerHTML = `<tr><th>رقم الشحنة</th><th>تاريخ الإنشاء</th><th>الحالة</th><th>تفاصيل</th></tr>`; 
+
+    if (shipments.length === 0) {
+        tableBody.innerHTML += `<tr><td colspan="4">لا توجد شحنات نشطة حالياً.</td></tr>`;
+        return;
+    }
+
+    shipments.forEach(shipment => {
+        const row = tableBody.insertRow(-1); // إضافة صف جديد
+        
+        const date = shipment.createdAt ? new Date(shipment.createdAt).toLocaleDateString('ar-EG') : 'غير متوفر';
+
+        row.innerHTML = `
+            <td>${shipment.id}</td>
+            <td>${date}</td>
+            <td>${shipment.status}</td>
+            <td><button class="details-btn" data-shipment-id="${shipment.id}">عرض</button></td>
+        `;
+    });
+}
+
+
+async function loadShipments(userId) {
+    const db = window.db;
+
+    try {
+        // الاستعلام عن الشحنات التي تعود للمستخدم الحالي
+        // (يجب أن يكون لديك مجموعة 'shipments' وحقل 'customerUid' مطابق لـ userId)
+        const snapshot = await db.collection('shipments')
+            .where('customerUid', '==', userId)
+            .get();
+
+        const shipments = [];
+        snapshot.forEach(doc => {
+            // استخدام doc.id كرقم للشحنة
+            shipments.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        renderShipments(shipments);
+
+    } catch (error) {
+        console.error("خطأ في جلب بيانات الشحنات:", error);
+        const tableBody = document.getElementById('shipments-table');
+        tableBody.innerHTML = `<tr><td colspan="4">فشل في تحميل البيانات. (الرجاء التحقق من قواعد الأمان)</td></tr>`;
+    }
+}
+
+
 // وظيفة التهيئة الرئيسية
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -49,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardBtn = document.getElementById('go-to-dashboard');
     if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
 
-    // مراقبة حالة المستخدم (باستخدام الدالة العالمية من firebaseConfig.js)
+    // مراقبة حالة المستخدم (الخطوة الأهم)
     const authStateChanged = window.onAuthStateChanged;
 
     authStateChanged((user) => {
@@ -57,7 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("المستخدم مسجل الدخول:", user.uid);
             updateDashboardUI(user);
             navigateTo('dashboard-page');
-            // هنا مستقبلاً: استدعاء دالة loadShipments(user.uid)
+            
+            // ** [جديد] استدعاء دالة جلب الشحنات **
+            loadShipments(user.uid); 
+
         } else {
             console.log("المستخدم غير مسجل.");
             navigateTo('login-page');
