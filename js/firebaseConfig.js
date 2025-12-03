@@ -1,7 +1,7 @@
 // 📄 js/firebaseConfig.js
-// [✅ التعديل هنا]: لم نعد نستورد الدوال من روابط CDN، بل من المكتبة نفسها التي تم تحميلها في index.html
-// يجب أن نستخدم now استيراد الدوال فقط بدون رابط
 
+// [✅ تم التعديل]: تم تغيير الاستيراد من الروابط الكاملة (CDN) إلى اسماء المكتبات
+// هذا يحل مشكلة 'Failed to resolve module specifier "firebase/app"'
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
