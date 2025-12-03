@@ -40,19 +40,15 @@ function renderShipments(shipments) {
     shipments.forEach(shipment => {
         const row = tableBody.insertRow(-1); // إضافة صف جديد
         
-        // ** [تم التعديل لمعالجة Timestamp] **
         let formattedDate = 'غير متوفر';
         if (shipment.createdAt) {
-             // التحقق مما إذا كان الكائن يحتوي على دالة toDate()، وهو سمة كائنات Timestamp في Firebase
+             // التحقق مما إذا كان الكائن يحتوي على دالة toDate()
              if (typeof shipment.createdAt.toDate === 'function') {
-                 // إذا كان كائن Timestamp: قم بتحويله إلى Date، ثم قم بتنسيقه
                  formattedDate = shipment.createdAt.toDate().toLocaleDateString('ar-EG');
              } else {
-                 // كود احتياطي (في حال تم إرساله كنص أو كائن Date عادي)
                  formattedDate = new Date(shipment.createdAt).toLocaleDateString('ar-EG');
              }
         }
-        // ** [نهاية التعديل] **
 
         row.innerHTML = `
             <td>${shipment.id}</td>
@@ -92,6 +88,81 @@ async function loadShipments(userId) {
 }
 
 
+// ==========================================
+// الدوال الجديدة: تفاصيل وسجل التتبع
+// ==========================================
+
+async function loadShipmentDetails(shipmentId) {
+    const db = window.db;
+    const historyList = document.getElementById('history-list');
+    
+    // إظهار شاشة التحميل
+    historyList.innerHTML = '<p>جاري تحميل سجل التتبع...</p>';
+    navigateTo('shipment-details-page');
+
+    try {
+        // 1. جلب بيانات الشحنة الأساسية
+        const shipmentDoc = await db.collection('shipments').doc(shipmentId).get();
+        
+        if (!shipmentDoc.exists) {
+            alert('لم يتم العثور على الشحنة.');
+            navigateTo('dashboard-page');
+            return;
+        }
+
+        const shipmentData = shipmentDoc.data();
+        
+        // تحديث الواجهة بمعلومات الشحنة
+        document.getElementById('tracking-number-display').textContent = shipmentDoc.id;
+        document.getElementById('details-tracking-number').textContent = shipmentDoc.id; 
+        document.getElementById('current-status').textContent = shipmentData.status;
+        
+        let createdAtDate = 'غير متوفر';
+        if (shipmentData.createdAt && typeof shipmentData.createdAt.toDate === 'function') {
+            createdAtDate = shipmentData.createdAt.toDate().toLocaleDateString('ar-EG');
+        }
+        document.getElementById('created-at-date').textContent = createdAtDate;
+
+        // 2. جلب سجل التتبع
+        const updatesSnapshot = await db.collection('trackingUpdates')
+            .where('shipmentId', '==', shipmentId)
+            .orderBy('timestamp', 'desc') // ترتيب من الأحدث للأقدم
+            .get();
+
+        historyList.innerHTML = ''; // مسح رسالة التحميل
+
+        if (updatesSnapshot.empty) {
+            historyList.innerHTML = '<p>لا يتوفر سجل تتبع لهذه الشحنة حالياً.</p>';
+        } else {
+            updatesSnapshot.forEach(doc => {
+                const update = doc.data();
+                let updateTime = '';
+                if (update.timestamp && typeof update.timestamp.toDate === 'function') {
+                    // عرض التاريخ والوقت المحلي 
+                    updateTime = update.timestamp.toDate().toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' }); 
+                }
+
+                // بناء عنصر Timeline
+                historyList.innerHTML += `
+                    <div class="timeline-item">
+                        <div class="timeline-date">${updateTime}</div>
+                        <div class="timeline-content">
+                            <h4>${update.status}</h4>
+                            <p>${update.location}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    } catch (error) {
+        console.error("خطأ في جلب تفاصيل الشحنة:", error);
+        alert('فشل في تحميل تفاصيل الشحنة. (تحقق من قواعد الأمان)');
+        historyList.innerHTML = '<p>فشل في تحميل سجل التتبع.</p>';
+        navigateTo('dashboard-page');
+    }
+}
+
+
 // وظيفة التهيئة الرئيسية
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -116,7 +187,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (createShipmentBtn) createShipmentBtn.addEventListener('click', () => navigateTo('create-shipment-page'));
 
     const dashboardBtn = document.getElementById('go-to-dashboard');
-    if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
+    // ربط العودة للوحة التحكم من صفحة الإنشاء (والتفاصيل)
+    document.querySelectorAll('#go-back-to-dashboard, #go-to-dashboard').forEach(btn => {
+        if (btn) btn.addEventListener('click', () => navigateTo('dashboard-page'));
+    });
+
+    // ** [جديد] ربط حدث النقر على أزرار "عرض" (Delegation) **
+    // نستخدم event delegation لربط النقر على الأزرار التي يتم إنشاؤها ديناميكياً
+    document.getElementById('shipment-list').addEventListener('click', (e) => {
+        if (e.target.classList.contains('details-btn')) {
+            const shipmentId = e.target.getAttribute('data-shipment-id');
+            loadShipmentDetails(shipmentId);
+        }
+    });
 
     // مراقبة حالة المستخدم (الخطوة الأهم)
     const authStateChanged = window.onAuthStateChanged;
