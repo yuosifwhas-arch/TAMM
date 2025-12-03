@@ -44,8 +44,8 @@
         </main>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth-compat.js"></script>
     
     <script>
         // 1. بيانات إعداد مشروعك
@@ -59,15 +59,15 @@
           measurementId: "G-6V51EXWFMJ"
         };
 
-        // 2. تهيئة التطبيق وتخزين الخدمات والدوال عالمياً (Global)
+        // 2. تهيئة التطبيق
         const app = firebase.initializeApp(firebaseConfig);
         
-        // تعريف المتغيرات العالمية باستخدام الطريقة القديمة (V9 Compatibility)
-        window.auth = firebase.auth();
-        // نستخدم .bind() لضمان أن الدوال تعمل بشكل صحيح مع سياقها
-        window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(firebase.auth());
-        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(firebase.auth());
-        window.signOut = firebase.auth().signOut.bind(firebase.auth());
+        // تعريف المتغيرات العالمية باستخدام V9 Compatibility (الطريقة الصحيحة)
+        window.auth = app.auth();
+        // نستخدم الدوال المتاحة من خلال النسخة التوافقية
+        window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(app.auth());
+        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(app.auth());
+        window.signOut = firebase.auth().signOut.bind(app.auth());
     </script>
 
 
@@ -186,7 +186,6 @@
             const authService = window.auth;
             const authStateChanged = window.onAuthStateChanged;
 
-            // تم إصلاح مشكلة TypeError هنا باستخدام الدالة المخزنة عالمياً
             authStateChanged(authService, (user) => {
                 if (user) {
                     console.log("المستخدم مسجل الدخول:", user.uid);
