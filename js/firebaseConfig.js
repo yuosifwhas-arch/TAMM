@@ -1,14 +1,13 @@
 // 📄 js/firebaseConfig.js
+// [✅ التعديل هنا]: لم نعد نستورد الدوال من روابط CDN، بل من المكتبة نفسها التي تم تحميلها في index.html
+// يجب أن نستخدم now استيراد الدوال فقط بدون رابط
 
-// [✅ تم التعديل]: تم تحديث روابط الاستيراد (Import) لتشمل رقم الإصدار (9.23.0) 
-// لحل مشكلة الخطأ 404 (Not Found) التي ظهرت في المتصفح.
-
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 
 
-// [✅ تم التأكيد]: هذه هي إعدادات مشروعك الحقيقية
+// [إعدادات المشروع]
 const firebaseConfig = {
     apiKey: "AIzaSyCIjIjs-2nhLrtssISWc0pNuX2UzxhQ3ZE",
     authDomain: "shipping-tracker-pro.firebaseapp.com",
@@ -25,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// [✅ تم التعديل]: تم وضع رابط Apps Script API الذي أرسلته
+// رابط Apps Script API
 const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyJ_v-RrcD2INcC7vlhklfCd_KreglwiIIWp4cAXVmdTApe5_Mj3cP5nlCN7LOqeZTLgw/exec";
 
 
@@ -33,7 +32,7 @@ const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyJ_v-RrcD
 export { 
     auth, 
     db, 
-    GOOGLE_SHEET_API_URL, // تصدير الرابط
+    GOOGLE_SHEET_API_URL, 
     signInWithEmailAndPassword, 
     onAuthStateChanged, 
     signOut,
