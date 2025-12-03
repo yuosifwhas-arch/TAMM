@@ -1,80 +1,78 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تتبع الشحنات - بوابة العميل</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تتبع الشحنات - بوابة العميل</title>
+    <link rel="stylesheet" href="css/style.css"> 
 </head>
 <body>
 
-    <div id="login-page" class="page active">
-        <div class="login-container">
-            <h2>تسجيل دخول العملاء</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">البريد الإلكتروني:</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">كلمة المرور:</label>
-                    <input type="password" id="password" required>
-                </div>
-                <button type="button" id="login-button">دخول</button>
-                <p id="error-message" class="error-text"></p>
-            </form>
-        </div>
-    </div>
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <h2>تسجيل دخول العملاء</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">كلمة المرور:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" id="login-button">دخول</button>
+                <p id="error-message" class="error-text"></p>
+            </form>
+            <p style="margin-top: 15px;">
+                <small>للتجربة: استخدم حساب قمت بإنشائه مسبقاً في Firebase Authentication.</small>
+            </p>
+        </div>
+    </div>
 
-    <div id="dashboard-page" class="page hidden">
-        <header>
-            <h1 id="welcome-user-text">لوحة التحكم الرئيسية</h1>
-            <button id="logout-button">تسجيل خروج</button>
-        </header>
-        <main>
-            <section id="status-summary"></section>
-            <section id="shipment-list">
-                <h2>شحناتي النشطة</h2>
-                <button id="go-to-create-shipment">إنشاء شحنة جديدة</button>
-                <table id="shipments-table"></table>
-            </section>
-        </main>
-    </div>
+    <div id="shipment-list-page" class="page hidden">
+        <header>
+            <h1 id="welcome-user-text">شحناتك</h1>
+            <button id="logout-button">تسجيل خروج</button>
+        </header>
+        <main>
+            <section id="shipment-actions">
+                <button id="create-new-shipment-btn">إنشاء شحنة جديدة</button>
+            </section>
+            
+            <section id="shipment-list-view">
+                <h2>شحناتي</h2>
+                <table id="shipments-table"></table>
+            </section>
+        </main>
+    </div>
 
-    <div id="create-shipment-page" class="page hidden">
-        <header>
-            <h1>إنشاء شحنة جديدة (قريباً)</h1>
-            <button id="go-to-dashboard">العودة للوحة التحكم</button>
-        </header>
-        <main>
-            <p>سيتم إضافة واجهة إنشاء الشحنات هنا لاحقاً.</p>
-        </main>
-    </div>
-    
-    <div id="shipment-details-page" class="page hidden">
-        <header>
-            <button id="go-back-to-dashboard" onclick="navigateTo('dashboard-page')">العودة للوحة التحكم</button>
-            <h1 id="details-header">تتبع الشحنة: <span id="tracking-number-display">#...</span></h1>
-        </header>
-        <main>
-            <section id="shipment-info">
-                <h2>معلومات الشحنة</h2>
-                <p><strong>رقم الشحنة:</strong> <span id="details-tracking-number"></span></p>
-                <p><strong>الحالة الحالية:</strong> <span id="current-status"></span></p>
-                <p><strong>تاريخ الإنشاء:</strong> <span id="created-at-date"></span></p>
-                </section>
-            
-            <section id="tracking-history">
-                <h2>سجل التتبع</h2>
-                <div id="history-list" class="timeline">
-                    </div>
-            </section>
-        </main>
-    </div>
+    <div id="shipment-details-page" class="page hidden">
+        <header>
+            <button id="go-back-to-list">العودة للشحنات</button>
+            <h1 id="details-header">تتبع الشحنة: <span id="tracking-number-display">#...</span></h1>
+        </header>
+        <main>
+            <section id="shipment-info">
+                <h2>معلومات الشحنة</h2>
+                <p><strong>رقم الشحنة:</strong> <span id="details-tracking-number"></span></p>
+                <p><strong>المالك (UID):</strong> <span id="owner-uid-display"></span></p>
+                <p><strong>الحالة الحالية:</strong> <span id="current-status"></span></p>
+                <p><strong>تاريخ الإنشاء:</strong> <span id="created-at-date"></span></p>
+            </section>
+            
+            <section id="tracking-history">
+                <h2>سجل التتبع</h2>
+                <div id="history-list" class="timeline">
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script type="module" src="js/firebaseConfig.js"></script>
 
+    <script type="module" src="js/trackingApi.js"></script>
+
     <script type="module" src="js/app.js"></script>
 
-    </body>
+</body>
 </html>
