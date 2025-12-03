@@ -24,7 +24,7 @@ const db = getFirestore(app);
 // [تعديل]: هنا يجب أن تضع الرابط الذي ستحصل عليه من نشر Apps Script
 // هذا الرابط هو الجسر بين تطبيقك و Google Sheets.
 // ستحصل على هذا الرابط في الخطوة 5.
-const GOOGLE_SHEET_API_URL = "PUT_YOUR_PUBLISHED_APPS_SCRIPT_URL_HERE";
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyJ_v-RrcD2INcC7vlhklfCd_KreglwiIIWp4cAXVmdTApe5_Mj3cP5nlCN7LOqeZTLgw/exec";
 
 
 // تصدير الدوال التي تحتاجها الملفات الأخرى
