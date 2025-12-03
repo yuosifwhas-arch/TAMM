@@ -44,11 +44,10 @@
         </main>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebase/9/firebase-app.js";
-        // تم استيراد جميع الدوال اللازمة
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebase/9/firebase-auth.js"; 
-
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth.js"></script>
+    
+    <script>
         // 1. بيانات إعداد مشروعك
         const firebaseConfig = {
           apiKey: "AIzaSyCIjIjs-2nhLrtssISWc0pNuX2UzxhQ3ZE",
@@ -61,23 +60,27 @@
         };
 
         // 2. تهيئة التطبيق وتخزين الخدمات والدوال عالمياً (Global)
-        const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.onAuthStateChanged = onAuthStateChanged;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword; 
-        window.signOut = signOut; 
+        const app = firebase.initializeApp(firebaseConfig);
+        
+        // تعريف المتغيرات العالمية باستخدام الطريقة القديمة (V9 Compatibility)
+        window.auth = firebase.auth();
+        // نستخدم .bind() لضمان أن الدوال تعمل بشكل صحيح مع سياقها
+        window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(firebase.auth());
+        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(firebase.auth());
+        window.signOut = firebase.auth().signOut.bind(firebase.auth());
     </script>
+
 
     <script>
         // ----------------------------------------------------------------------
-        // الدوال المدمجة من js/auth.js (مُصححة)
+        // الدوال المدمجة من js/auth.js 
         // ----------------------------------------------------------------------
 
         // دالة التعامل مع تسجيل الدخول
         async function handleLogin(email, password) {
-            // التصحيح: استخدام أسماء جديدة للمتغيرات لضمان عدم التعارض
+            // نستخدم المتغيرات العالمية التي تم تعريفها في الجزء العلوي
             const authService = window.auth; 
-            const signInService = window.signInWithEmailAndPassword; // استخدام اسم متغير جديد: signInService
+            const signInService = window.signInWithEmailAndPassword;
 
             const errorMessageElement = document.getElementById('error-message');
             if (errorMessageElement) {
@@ -86,7 +89,7 @@
             }
 
             try {
-                // محاولة تسجيل الدخول باستخدام المتغير الجديد
+                // محاولة تسجيل الدخول
                 await signInService(authService, email, password); 
 
             } catch (error) {
@@ -112,10 +115,10 @@
         // دالة تسجيل الخروج
         async function logoutUser() {
             const authService = window.auth;
-            const signOutService = window.signOut; // استخدام اسم متغير جديد: signOutService
+            const signOutService = window.signOut;
             
             try {
-                await signOutService(authService); // استخدام المتغير الجديد
+                await signOutService(authService);
             } catch (error) {
                 console.error("خطأ في تسجيل الخروج:", error.message);
                 alert("فشل تسجيل الخروج.");
@@ -159,7 +162,6 @@
                 loginButton.addEventListener('click', () => {
                     const email = document.getElementById('email').value;
                     const password = document.getElementById('password').value;
-                    // يتم استدعاء الدالة المدمجة
                     handleLogin(email, password); 
                 });
             }
@@ -184,6 +186,7 @@
             const authService = window.auth;
             const authStateChanged = window.onAuthStateChanged;
 
+            // تم إصلاح مشكلة TypeError هنا باستخدام الدالة المخزنة عالمياً
             authStateChanged(authService, (user) => {
                 if (user) {
                     console.log("المستخدم مسجل الدخول:", user.uid);
