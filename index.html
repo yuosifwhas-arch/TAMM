@@ -41,6 +41,37 @@
         </main>
     </div>
 
+    <div id="create-shipment-page" class="page hidden">
+        <header>
+            <h1>إنشاء شحنة جديدة (قريباً)</h1>
+            <button id="go-to-dashboard">العودة للوحة التحكم</button>
+        </header>
+        <main>
+            <p>سيتم إضافة واجهة إنشاء الشحنات هنا لاحقاً.</p>
+        </main>
+    </div>
+    
+    <div id="shipment-details-page" class="page hidden">
+        <header>
+            <button id="go-back-to-dashboard" onclick="navigateTo('dashboard-page')">العودة للوحة التحكم</button>
+            <h1 id="details-header">تتبع الشحنة: <span id="tracking-number-display">#...</span></h1>
+        </header>
+        <main>
+            <section id="shipment-info">
+                <h2>معلومات الشحنة</h2>
+                <p><strong>رقم الشحنة:</strong> <span id="details-tracking-number"></span></p>
+                <p><strong>الحالة الحالية:</strong> <span id="current-status"></span></p>
+                <p><strong>تاريخ الإنشاء:</strong> <span id="created-at-date"></span></p>
+                </section>
+            
+            <section id="tracking-history">
+                <h2>سجل التتبع</h2>
+                <div id="history-list" class="timeline">
+                    </div>
+            </section>
+        </main>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script> 
