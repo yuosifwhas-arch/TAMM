@@ -24,7 +24,7 @@ function updateDashboardUI(user) {
 }
 
 // ==========================================
-// الدوال الجديدة: جلب وعرض الشحنات
+// الدوال: جلب وعرض الشحنات
 // ==========================================
 
 function renderShipments(shipments) {
@@ -40,11 +40,21 @@ function renderShipments(shipments) {
     shipments.forEach(shipment => {
         const row = tableBody.insertRow(-1); // إضافة صف جديد
         
-        const date = shipment.createdAt ? new Date(shipment.createdAt).toLocaleDateString('ar-EG') : 'غير متوفر';
+        // ** [تعديل هنا] التعامل مع حقل Timestamp من Firestore **
+        let formattedDate = 'غير متوفر';
+        if (shipment.createdAt) {
+             if (typeof shipment.createdAt.toDate === 'function') {
+                 // الخيار الأفضل: إذا كان كائن Timestamp من Firebase V8
+                 formattedDate = shipment.createdAt.toDate().toLocaleDateString('ar-EG');
+             } else {
+                 // الخيار الاحتياطي: إذا تم تحويله إلى كائن تاريخ عادي أو نص
+                 formattedDate = new Date(shipment.createdAt).toLocaleDateString('ar-EG');
+             }
+        }
 
         row.innerHTML = `
             <td>${shipment.id}</td>
-            <td>${date}</td>
+            <td>${formattedDate}</td>
             <td>${shipment.status}</td>
             <td><button class="details-btn" data-shipment-id="${shipment.id}">عرض</button></td>
         `;
@@ -116,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDashboardUI(user);
             navigateTo('dashboard-page');
             
-            // ** [جديد] استدعاء دالة جلب الشحنات **
+            // استدعاء دالة جلب الشحنات 
             loadShipments(user.uid); 
 
         } else {
