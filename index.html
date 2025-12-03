@@ -44,8 +44,8 @@
         </main>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-app-compat.js?v=20251203b"></script>
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth-compat.js?v=20251203b"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-app-compat.js?v=20251203c"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth-compat.js?v=20251203c"></script>
     
     <script>
         // 1. بيانات إعداد مشروعك
@@ -64,9 +64,10 @@
         
         // تعريف المتغيرات العالمية باستخدام V9 Compatibility
         window.auth = app.auth();
-        window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(app.auth());
-        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(app.auth());
-        window.signOut = firebase.auth().signOut.bind(app.auth());
+        // تم تبسيط استدعاء الدوال (إزالة bind)
+        window.onAuthStateChanged = firebase.auth().onAuthStateChanged;
+        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword;
+        window.signOut = firebase.auth().signOut;
     </script>
 
 
@@ -87,6 +88,18 @@
                 errorMessageElement.style.display = 'none';
             }
 
+            // ** التحقق الأولي: إذا كانت الحقول فارغة، أظهر رسالة وتوقف **
+            if (!email || !password) {
+                let message = "الرجاء إدخال البريد الإلكتروني وكلمة المرور.";
+                if (errorMessageElement) {
+                    errorMessageElement.textContent = `فشل الدخول: ${message}`;
+                    errorMessageElement.style.display = 'block';
+                }
+                console.warn("حقل فارغ: تم منع الإرسال إلى Firebase.");
+                return; 
+            }
+            // -----------------------------------------------------------------
+
             try {
                 // محاولة تسجيل الدخول
                 await signInService(authService, email, password); 
@@ -94,7 +107,7 @@
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.message);
 
-                // معالجة أخطاء Firebase بشكل دقيق
+                // معالجة أخطاء Firebase
                 let message = "حدث خطأ غير معروف في تسجيل الدخول.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
