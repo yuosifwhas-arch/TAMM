@@ -25,7 +25,7 @@ async function handleLogin(email, password) {
     errorMessage.textContent = ''; 
     
     try {
-        // [✅ تم التعديل]: تم إضافة 'auth' كمعامل أول
+        // [✅ تم التعديل]: تمرير 'auth' كمعامل أول
         await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
         let msg = "فشل تسجيل الدخول. تحقق من البيانات.";
@@ -38,7 +38,7 @@ async function handleLogin(email, password) {
 }
 
 function logoutUser() {
-    // [✅ تم التعديل]: تم تمرير 'auth' لضمان عمل تسجيل الخروج
+    // [✅ تم التعديل]: تمرير 'auth' لتسجيل الخروج
     signOut(auth);
 }
 
