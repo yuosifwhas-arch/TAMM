@@ -44,8 +44,8 @@
         </main>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-app-compat.js?v=20251203b"></script>
+    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth-compat.js?v=20251203b"></script>
     
     <script>
         // 1. بيانات إعداد مشروعك
@@ -62,9 +62,8 @@
         // 2. تهيئة التطبيق
         const app = firebase.initializeApp(firebaseConfig);
         
-        // تعريف المتغيرات العالمية باستخدام V9 Compatibility (الطريقة الصحيحة)
+        // تعريف المتغيرات العالمية باستخدام V9 Compatibility
         window.auth = app.auth();
-        // نستخدم الدوال المتاحة من خلال النسخة التوافقية
         window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(app.auth());
         window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(app.auth());
         window.signOut = firebase.auth().signOut.bind(app.auth());
@@ -95,7 +94,7 @@
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.message);
 
-                // الآن يجب أن يعمل هذا الجزء بشكل صحيح ويعرض رسائل الأخطاء المحددة
+                // معالجة أخطاء Firebase بشكل دقيق
                 let message = "حدث خطأ غير معروف في تسجيل الدخول.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
