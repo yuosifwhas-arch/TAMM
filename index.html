@@ -32,21 +32,18 @@
             <button id="logout-button">تسجيل خروج</button>
         </header>
         <main>
-            <section id="status-summary">
-                </section>
-            
+            <section id="status-summary"></section>
             <section id="shipment-list">
                 <h2>شحناتي النشطة</h2>
                 <button id="go-to-create-shipment">إنشاء شحنة جديدة</button>
-                <table id="shipments-table">
-                    </table>
+                <table id="shipments-table"></table>
             </section>
         </main>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-app-compat.js?v=20251203c"></script>
-    <script src="https://www.gstatic.com/firebasejs/9/firebase-auth-compat.js?v=20251203c"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
     <script>
         // 1. بيانات إعداد مشروعك
         const firebaseConfig = {
@@ -62,23 +59,18 @@
         // 2. تهيئة التطبيق
         const app = firebase.initializeApp(firebaseConfig);
         
-        // تعريف المتغيرات العالمية باستخدام V9 Compatibility
-        window.auth = app.auth();
-        // تم تبسيط استدعاء الدوال (إزالة bind)
-        window.onAuthStateChanged = firebase.auth().onAuthStateChanged;
-        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword;
-        window.signOut = firebase.auth().signOut;
+        // تعريف المتغيرات العالمية (V8)
+        window.auth = firebase.auth(); 
+        window.onAuthStateChanged = firebase.auth().onAuthStateChanged.bind(firebase.auth());
+        window.signInWithEmailAndPassword = firebase.auth().signInWithEmailAndPassword.bind(firebase.auth());
+        window.signOut = firebase.auth().signOut.bind(firebase.auth());
     </script>
 
 
     <script>
-        // ----------------------------------------------------------------------
-        // الدوال المدمجة من js/auth.js 
-        // ----------------------------------------------------------------------
-
         // دالة التعامل مع تسجيل الدخول
         async function handleLogin(email, password) {
-            // نستخدم المتغيرات العالمية التي تم تعريفها في الجزء العلوي
+            // نستخدم المتغيرات العالمية
             const authService = window.auth; 
             const signInService = window.signInWithEmailAndPassword;
 
@@ -88,26 +80,23 @@
                 errorMessageElement.style.display = 'none';
             }
 
-            // ** التحقق الأولي: إذا كانت الحقول فارغة، أظهر رسالة وتوقف **
+            // التحقق الأولي: إذا كانت الحقول فارغة، أظهر رسالة وتوقف
             if (!email || !password) {
                 let message = "الرجاء إدخال البريد الإلكتروني وكلمة المرور.";
                 if (errorMessageElement) {
                     errorMessageElement.textContent = `فشل الدخول: ${message}`;
                     errorMessageElement.style.display = 'block';
                 }
-                console.warn("حقل فارغ: تم منع الإرسال إلى Firebase.");
                 return; 
             }
-            // -----------------------------------------------------------------
 
             try {
                 // محاولة تسجيل الدخول
+                // استخدام (authService) كأول معامِل هو الحل الوسط الذي يعمل مع V8 و V9 Compat
                 await signInService(authService, email, password); 
 
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.message);
-
-                // معالجة أخطاء Firebase
                 let message = "حدث خطأ غير معروف في تسجيل الدخول.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
@@ -137,11 +126,7 @@
             }
         }
 
-        // ----------------------------------------------------------------------
         // الدوال المدمجة من js/app.js 
-        // ----------------------------------------------------------------------
-        
-        // دالة التنقل بين الواجهات
         function navigateTo(pageId) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
@@ -155,7 +140,6 @@
             }
         }
 
-        // وظيفة تحديث واجهة المستخدم
         function updateDashboardUI(user) {
             const welcomeText = document.getElementById('welcome-user-text');
             if (welcomeText && user) {
@@ -166,10 +150,7 @@
 
         // وظيفة التهيئة الرئيسية
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // ربط زر تسجيل الدخول
             const loginButton = document.getElementById('login-button');
-
             if (loginButton) {
                 loginButton.addEventListener('click', () => {
                     const email = document.getElementById('email').value;
@@ -178,18 +159,14 @@
                 });
             }
 
-            // ربط زر تسجيل الخروج
             const logoutButton = document.getElementById('logout-button');
             if (logoutButton) {
                 logoutButton.addEventListener('click', logoutUser);
             }
 
-            // ربط أزرار التنقل
+            // ربط أزرار التنقل (للتأكد من عدم وجود أخطاء)
             const createShipmentBtn = document.getElementById('go-to-create-shipment');
             if (createShipmentBtn) createShipmentBtn.addEventListener('click', () => navigateTo('create-shipment-page'));
-
-            const invoicesBtn = document.getElementById('go-to-invoices');
-            if (invoicesBtn) invoicesBtn.addEventListener('click', () => navigateTo('invoices-page'));
 
             const dashboardBtn = document.getElementById('go-to-dashboard');
             if (dashboardBtn) dashboardBtn.addEventListener('click', () => navigateTo('dashboard-page'));
