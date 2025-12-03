@@ -1,10 +1,9 @@
 // 📄 js/firebaseConfig.js
 
-// [✅ تم التعديل]: تم تغيير الاستيراد من الروابط الكاملة (CDN) إلى اسماء المكتبات
-// هذا يحل مشكلة 'Failed to resolve module specifier "firebase/app"'
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+// [✅ تم التعديل]: تم العودة لاستخدام روابط CDN v9 الثابتة والموثوقة لحل مشاكل التحميل
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9/firebase-auth.js';
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9/firebase-firestore.js';
 
 
 // [إعدادات المشروع]
